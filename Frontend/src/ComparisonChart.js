@@ -71,12 +71,12 @@ function ComparisonChart() {
   // const [chartData, setChartData] = useState({});
   return (
     <Box
-      mt={100}
-      maxH="500px"
-      width="600px"
+      mt={50}
+      height="300px"
+      width="400px"
       pos="fixed"
       top="350"
-      left="800"
+      left="700"
       bgColor="#000000"
     >
       <Line data={chartData} options={options} />

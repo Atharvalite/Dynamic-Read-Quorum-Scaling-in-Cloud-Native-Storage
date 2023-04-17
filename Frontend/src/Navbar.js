@@ -1,15 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Flex,
   Heading,
   Spacer,
-  useColorMode,
+  // IconButton,
+  // useColorMode,
   Button
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+// import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+// import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
 function Navbar() {
-  const { colorMode, toggleColorMode } = useColorMode();
+  // const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Flex bgGradient="linear(to-l, #18122B,#19376D)">
       <Heading as="h2" p={3} size="lg" noOfLines={1}>
@@ -19,6 +22,14 @@ function Navbar() {
       <Button m={2} mr={4} bgColor="#146C94">
         <Link to="/learnmore">Learn More</Link>
       </Button>
+      {/* <IconButton
+        m={2}
+        mr={4}
+        onClick={toggleColorMode}
+        _hover={colorMode === "light" ? "#E15FED"  : "#77ACF1" }
+        bg={colorMode === "light" ? "#D09CFA" : "#143F6B"}
+        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+      /> */}
     </Flex>
   );
 }

@@ -14,23 +14,41 @@ import {
   SliderThumb,
   Heading,
 } from "@chakra-ui/react";
+import axios from "./axios";
+import { useNavigate } from 'react-router-dom';
+
 
 function Epoch() {
+  const history=useNavigate();
   const [writeQ, setWriteQ] = useState(0);
   const [readQ, setReadQ] = useState(0);
   const handleChange1 = (value) => setWriteQ(value);
   const handleChange2 = (value) => setReadQ(value);
   const Quorum={
-    write:0,
-    read:0
+    "write":0,
+    "read":0
+}
+const postAPI=async ()=>{
+    let gotRes=await axios.post("/",Quorum).catch((err)=>{
+        console.log("This error message",err);
+    });
+    const data = await gotRes.data;
+    return data;
   }
+function submission(event){
+  event.preventDefault();
+    Quorum.write=writeQ;
+    Quorum.read=readQ;
+    console.log('Submitted...!!');
+    postAPI().then(()=>history("/demo"));
+}
   return (
-    <Box ml={100} mb={100} width={350} pos="fixed" top="150" left="850">
-      <form>
+    <Box ml={100} mb={100} width={350} pos="fixed" top="100" left="750">
+      <form onSubmit={submission}>
         <Heading as="h3" size="md" p={2}>
           Enter Write request:
         </Heading>
-        <Flex boxShadow="dark-lg" p="2" rounded="md" bgColor="#00337C">
+        <Flex boxShadow="dark-lg" p={2} rounded="md" bgColor="#00337C">
           <NumberInput
             maxW="100px"
             mr="2rem"
