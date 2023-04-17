@@ -19,14 +19,29 @@ class writequorum(configquorum):
 
         pass
     def update_db_lit(self,new_val_l):
-
+        creation_time = time.strftime("%H_%M_%S")
         for i in range(len(new_val_l)):
+            n = self.availability_zones[list(self.availability_zones.keys())[0]]['name']
+            self.create_wal_file(f'{n}db_1', self.client[n], new_val_l[i],creation_time)
             self.update_db(new_val_l[i])
+            
+        with open(f'wal/wal_global.json', "r") as file:
+            master = json.load(file)
+        master.append(
+            {"id": self.global_id, "file_name": f"wal_report_{creation_time}.json"})
+        
+        
+        self.global_id += 1
+        dotenv.set_key('config.env', "global_id", str(self.global_id))
+        
+        with open(f'wal/wal_global.json', "w") as file:
+            json.dump(master, file)
+          
 
     def update_db(self, new_val):
         availability_zones_k = list(self.availability_zones.keys())
         n = self.availability_zones[availability_zones_k[0]]['name']
-        self.create_wal_file(f'{n}db_1', self.client[n], new_val)
+        # self.create_wal_file(f'{n}db_1', self.client[n], new_val)
         for i in range(len(self.availability_zones.keys())):
             name = self.availability_zones[availability_zones_k[i]]['name']
             db_l = self.availability_zones[availability_zones_k[i]]['db']
@@ -46,15 +61,13 @@ class writequorum(configquorum):
             db_l['consistent_state_no']+=self.global_id
             
 
-    def create_wal_file(self,id, db, new_val):
+    def create_wal_file(self,id, db, new_val,creation_time):
         # putting all in wal for that time
-        creation_time = time.strftime("%H_%M_%S")
+        
         
         wal_file = open(f'wal/wal_report_{creation_time}.json', 'w')
         
-        with open(f'wal/wal_global.json', "r") as file:
-            master = json.load(file)
-            
+        
         
         new_val_k = list(new_val.keys())
         data = {}
@@ -63,15 +76,6 @@ class writequorum(configquorum):
                        "old_val": db[id].find_one({'_id': new_val_k[i]})['value'], "new_val": new_val[new_val_k[i]]}
         
         data = json.dumps(data)
-        wal_file.write(data)
-        master.append(
-            {"id": self.global_id, "file_name": f"wal_report_{creation_time}.json"})
-        
-        
-        self.global_id += 1
-        dotenv.set_key('config.env', "global_id", str(self.global_id))
-        
-        with open(f'wal/wal_global.json', "w") as file:
-            json.dump(master, file)
+        wal_file.append(data)
         
    
