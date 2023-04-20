@@ -22,10 +22,14 @@ class readquorum(configquorum):
 
         reqs = request_json["requests"]
         n = request_json["total_requests"]
+        # print(reqs)
 
         for i in range(n):
             id = reqs[i]["az"]
             name = self.availability_zones[id]['name']
+
+            # print("Total limit: ",self.availability_zones[id]["total_limit"])
+            # print("Total ongoing: ",self.threshold*self.availability_zones[id]["total_ongoing_requests"])
 
             if self.availability_zones[id]["total_limit"]>self.threshold*self.availability_zones[id]["total_ongoing_requests"]:
 
@@ -34,24 +38,32 @@ class readquorum(configquorum):
                 limit =  self.availability_zones[id]["limit"]
 
                 
-
+                z = 0
                 for db in dbs:
+                    
                     if db['status']=='active' and db['designation']!="write" and db['requests']<self.threshold*limit:
-                        db['requests']+=1
+                        self.availability_zones[id]["db"][z]['requests']+=1
+                        t1 = time.strftime("%H:%M:%S")
                         v = self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item'])
+
+                        break
+
                         # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
 
                     elif db['status']=='froze' and db['requests']<self.threshold*limit:
-                        db['requests']+=1
-                        db['consistent_state_no'] = self.unfreeze(az=name, db_name=name+db["id"], consistent_no=db['consistent_state_no'])
+                        print("How many times?")
+                        self.availability_zones[id]["db"][z]['requests']+=1
+                        self.availability_zones[id]["db"][z]['consistent_state_no'] = self.unfreeze(az=name, db_name=name+db["id"], consistent_no=db['consistent_state_no'])
                         v = self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item'])
 
-                        # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
+                        break
+                    z+=1
 
             else:
                 new_name = self.find_nearest(name)
                 if new_name!=-1:
-                    id = self.az_id[new_name]
+                    # id = self.az_id[new_name]
+                    id = new_name
                     self.availability_zones[id]["total_ongoing_requests"]+=1
                     dbs = self.availability_zones[id]["db"]
                     limit =  self.availability_zones[id]["limit"]
@@ -60,17 +72,18 @@ class readquorum(configquorum):
                         if db['status']=='active' and db['designation']!="write" and db['requests']<self.threshold*limit:
                             db['requests']+=1
                             v = self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item'])
+                            break
 
                             # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
 
                         elif db['status']=='froze':
-                            db['requests']+=1
-                            db['consistent_state_no'] = self.unfreeze(az=name, db_name=name+db["id"],consistent_no=db['consistent_state_no'] )
+                            self.availability_zones[id]["db"][z]['requests']+=1
+                            self.availability_zones[id]["db"][z]['consistent_state_no'] = self.unfreeze(az=name, db_name=name+db["id"],consistent_no=db['consistent_state_no'] )
                             # db['status'] = 'active'
                             v = self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item'])
+                            break
                             # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
                             
-
         # print((t2-t1).total_seconds())
 
      
@@ -84,15 +97,16 @@ class readquorum(configquorum):
             if curr_id>consistent_no:
 
                 updt_file = open(file_name, 'r')
-                updt_json = json.load(updt_file) 
+                updt_jsons = json.load(updt_file) 
+                for updt_json in updt_jsons:
 
-                keys = list(updt_json.keys())
+                    keys = list(updt_json.keys())
 
-                for i in keys:
+                    for i in keys:
 
-                    x = updt_json[i]['dataitem'] 
-                    new_val = updt_json[i]['new_val']
-                    self.client[az][db_name].update_one({'_id':x},{'$set':{'value':new_val}})
+                        x = updt_json[i]['dataitem'] 
+                        new_val = updt_json[i]['new_val']
+                        self.client[az][db_name].update_one({'_id':x},{'$set':{'value':new_val}})
 
         return curr_id
 

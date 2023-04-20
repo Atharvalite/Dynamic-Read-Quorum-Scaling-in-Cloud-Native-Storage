@@ -1,5 +1,3 @@
-from flask import Flask, jsonify, request
-from flask_restful import Resource, Api
 import numpy as np
 import time
 import os
@@ -11,13 +9,8 @@ import dotenv
 from dotenv import load_dotenv
 load_dotenv('config.env')
 
-app = Flask(__name__)
-
-api = Api(app)
-
-class MasterNode(Resource):
+class MasterNode():
     def __init__(self) -> None:
-        super().__init__()
         url = os.environ.get('MONGOURL')
         threshold = 1
         wal_global_file = 'wal/wal_global.json'
@@ -30,26 +23,9 @@ class MasterNode(Resource):
         
         pass
     
-    def get(self):
-        # print(request.data.decode('utf-8'))
-        return jsonify({"Response":"Yes"})
-    def post(self):
-        print("Hello")
-        # data = request.get_json()
-        data = request.data.decode('utf-8')
-        print(data)
-
-        # read_num = int(data['read'])
-        # write_num = int(data['write'])
-        # print("Hello: ",write_num)
-
-        # # res = self.service_req(read_num, write_num)
-
-        # return jsonify({"Response":"Yes", "ReadNum":read_num})
-    
     def service_req(self, read_num, write_num):
-        res = []
-        trad_res = []
+        res = [0]
+        trad_res = [0]
         ri = 0
         rj = int(0.2*read_num)
         wi = 0
@@ -58,37 +34,39 @@ class MasterNode(Resource):
         while(ri<read_num or wi<write_num):
             read_req = self.generate_random_read(rj)
             write_req = self.generate_random_write(wj)
-
+            
             if wi<write_num:
                 t1 = time.strftime("%H:%M:%S")
                 self.writeq.update_db_lit(write_req)
                 t2 = time.strftime("%H:%M:%S")
-                res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
+                res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
             if ri<read_num:
+
                 t1 = time.strftime("%H:%M:%S")
                 self.readq.read(read_req)
                 t2 = time.strftime("%H:%M:%S")
-                res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
+                res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
-            if wi<write_num:
-                t1 = time.strftime("%H:%M:%S")
-                self.tradwrite.update_db_lit(write_req)
-                t2 = time.strftime("%H:%M:%S")
-                res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
+            # if wi<write_num:
+            #     t1 = time.strftime("%H:%M:%S")
+            #     self.tradwrite.update_db_lit(write_req)
+            #     t2 = time.strftime("%H:%M:%S")
+            #     trad_res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
 
-            if ri<read_num:
-                t1 = time.strftime("%H:%M:%S")
-                self.tradread.read(read_req)
-                t2 = time.strftime("%H:%M:%S")
-                trad_res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
+            # if ri<read_num:
+            #     t1 = time.strftime("%H:%M:%S")
+            #     self.tradread.read(read_req)
+            #     t2 = time.strftime("%H:%M:%S")
+            #     trad_res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
 
             ri+=rj
             wi+=wj
+        self.readq.update_az()
             
         return {
-            "Result":res,
-            "Traditional Result":trad_res
+            "our-result":res,
+            "trad-result":trad_res
         }
     
     
@@ -123,10 +101,3 @@ class MasterNode(Resource):
             }
             response.append(write_json)
         return response
-
-
-api.add_resource(MasterNode,'/')
-
-if __name__ == '__main__':
-  
-    app.run(debug = True)

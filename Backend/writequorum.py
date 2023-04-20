@@ -20,11 +20,16 @@ class writequorum(configquorum):
         pass
     def update_db_lit(self,new_val_l):
         creation_time = time.strftime("%H_%M_%S")
+        lst_up = []
         for i in range(len(new_val_l)):
             n = self.availability_zones[list(self.availability_zones.keys())[0]]['name']
-            self.create_wal_file(f'{n}db_1', self.client[n], new_val_l[i],creation_time)
+            self.create_wal_file(f'{n}db_1', self.client[n], new_val_l[i],lst_up)
             self.update_db(new_val_l[i])
-            
+
+        with open(f'wal/wal_report_{creation_time}.json', 'w') as wal_file:
+            json.dump(lst_up, wal_file)
+
+        # wal_file.write(lst_up)
         with open(f'wal/wal_global.json', "r") as file:
             master = json.load(file)
         master.append(
@@ -61,21 +66,15 @@ class writequorum(configquorum):
             db_l['consistent_state_no']+=self.global_id
             
 
-    def create_wal_file(self,id, db, new_val,creation_time):
+    def create_wal_file(self,id, db, new_val,lst):
         # putting all in wal for that time
-        
-        
-        wal_file = open(f'wal/wal_report_{creation_time}.json', 'w')
-        
-        
-        
         new_val_k = list(new_val.keys())
         data = {}
         for i in range(len(new_val_k)):
             data[i] = {"dataitem": new_val_k[i],
                        "old_val": db[id].find_one({'_id': new_val_k[i]})['value'], "new_val": new_val[new_val_k[i]]}
         
-        data = json.dumps(data)
-        wal_file.append(data)
+        # data = json.dumps(data)
+        lst.append(data)
         
    

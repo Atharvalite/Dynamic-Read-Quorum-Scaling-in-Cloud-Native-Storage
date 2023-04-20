@@ -10,90 +10,10 @@ from datetime import datetime
 
 class configquorum:
     def __init__(self, MONGOURL) -> None:
-        client = MongoClient(MONGOURL)
+        self.client = MongoClient(MONGOURL)
 
-        self.availability_zones = {
-            "AZ_1": {
-                'name': "IN-KN",
-                "az_status": "Working",
-                "total_ongoing_requests": 0,
-                "total_limit": 60,
-                "limit": 20,
-                "db": [
-                    {"id": 'db_1', 'status': 'active',
-                        'designation': 'write', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_2', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_3', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_4', 'status': 'froze', 'designation': 'read', 'requests': 0,'consistent_state_no':-1}
-                ]
-            },
-            "AZ_2": {
-                'name': "IN-MU",
-                'az_status': 'Working',
-                "total_ongoing_requests": 0,
-                "total_limit": 60,
-                "limit": 20,
-                "db": [
-                    {"id": 'db_1', 'status': 'active',
-                        'designation': 'write', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_2', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_3', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_4', 'status': 'froze', 'designation': 'read', 'requests': 0,'consistent_state_no':-1}
-                ]
-            },
-            "AZ_3": {
-                'name': "IN-KT",
-                'az_status': 'Working',
-                "total_ongoing_requests": 0,
-                "total_limit": 60,
-                "limit": 20,
-                "db": [
-                    {"id": 'db_1', 'status': 'active',
-                        'designation': 'write', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_2', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_3', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_4', 'status': 'froze', 'designation': 'read', 'requests': 0,'consistent_state_no':-1}
-                ]
-            },
-            "AZ_4": {
-                'name': "IN-DLH",
-                'az_status': 'Working',
-                "total_ongoing_requests": 0,
-                "total_limit": 60,
-                "limit": 20,
-                "db": [
-                    {"id": 'db_1', 'status': 'active',
-                        'designation': 'write', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_2', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_3', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_4', 'status': 'froze', 'designation': 'read', 'requests': 0,'consistent_state_no':-1}
-                ]
-            },
-            "AZ_5": {
-                'name': "IN-PT",
-                'az_status': 'Working',
-                "total_ongoing_requests": 0,
-                "total_limit": 60,
-                "limit": 20,
-                "db": [
-                    {"id": 'db_1', 'status': 'active',
-                        'designation': 'write', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_2', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_3', 'status': 'active',
-                        'designation': 'write/read', 'requests': 0,'consistent_state_no':-1},
-                    {"id": 'db_4', 'status': 'froze', 'designation': 'read', 'requests': 0,'consistent_state_no':-1}
-                ]
-            }
-        }
+        with open('availability_zones.json','r') as file: 
+            self.availability_zones = json.load(file)
 
         self.az_list = ["AZ_1","AZ_2","AZ_3","AZ_4","AZ_5"]
         
@@ -128,6 +48,17 @@ class configquorum:
                 'Y': {'X': 1, 'W': 1,},
             }
         
-        docs = client['IN-KT']['IN-KTdb_1'].find()
+        docs = self.client['IN-KT']['IN-KTdb_1'].find()
 
         self.data_items = [doc['_id'] for doc in docs]
+    
+    def update_az(self):
+        for az in self.availability_zones.keys():
+            self.availability_zones[az]["total_ongoing_requests"] = 0
+            for i in range(4):
+                self.availability_zones[az]["db"][i]["requests"]=0
+        
+        with open('availability_zones.json','w') as file: 
+            json.dump(self.availability_zones, file)
+        return
+    
