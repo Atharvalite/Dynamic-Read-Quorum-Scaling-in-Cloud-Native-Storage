@@ -4,12 +4,12 @@ import {
   Flex,
   Heading,
   Spacer,
-  // IconButton,
-  // useColorMode,
+  IconButton,
+  useColorMode,
   Button
 } from "@chakra-ui/react";
-// import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
-// import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
+ import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
 
 function Navbar() {
