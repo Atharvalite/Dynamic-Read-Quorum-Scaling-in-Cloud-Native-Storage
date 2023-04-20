@@ -155,14 +155,17 @@ class traditional_write(configquorum):
         n = self.availability_zones[availability_zones_k[0]]['name']
         self.create_wal_file(f'{n}db_1', self.client[n], new_val)
         for i in range(len(self.availability_zones.keys())):
+            
             name = self.availability_zones[availability_zones_k[i]]['name']
             db_l = self.availability_zones[availability_zones_k[i]]['db']
             db_c = self.client[name]
             for j in range(len(db_l)):
                 # if (db_l[j]['status'] != 'froze'):
                 dd_c_id = f'{name}db_{j}'
-                self.write_update_quorum(dd_c_id, db_c, new_val,db_l[j])
-
+                consistent_state_no = self.availability_zones[availability_zones_k[i]]['db'][i]['consistent_state_no']
+                self.availability_zones[availability_zones_k[i]]['db'][i]['consistent_state_no']  = self.update_thr_file(availability_zones_k[i],dd_c_id,consistent_state_no)
+                
+                # self.write_update_quorum(dd_c_id, db_c, new_val,db_l[j])
     def write_update_quorum(self,id, db, new_val: dict,db_l):
         new_val_k = list(new_val.keys())
         
@@ -200,3 +203,26 @@ class traditional_write(configquorum):
         with open(f'wal/wal_global.json', "w") as file:
             json.dump(master, file)
         
+    
+    def update_thr_file(self, az=None, db_name=None, consistent_no=None):
+        curr_id = -1
+
+        for j in range(len(self.global_json)):
+            
+            file_name = 'wal/'+self.global_json[j]['file_name']
+            curr_id = self.global_json[j]["id"]
+            if curr_id>consistent_no:
+
+                updt_file = open(file_name, 'r')
+                updt_jsons = json.load(updt_file) 
+                for updt_json in updt_jsons:
+
+                    keys = list(updt_json.keys())
+
+                    for i in keys:
+
+                        x = updt_json[i]['dataitem'] 
+                        new_val = updt_json[i]['new_val']
+                        self.client[az][db_name].update_one({'_id':x},{'$set':{'value':new_val}})
+
+        return curr_id
