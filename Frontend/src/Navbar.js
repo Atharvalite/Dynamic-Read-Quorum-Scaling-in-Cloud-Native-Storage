@@ -11,16 +11,23 @@ import {
 // import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 // import { MoonIcon, SunIcon, ChevronDownIcon } from "@chakra-ui/icons";
 
+
 function Navbar() {
-  // const { colorMode, toggleColorMode } = useColorMode();
+
+  function handleButtonClick() {
+    window.location.href =
+      "https://github.com/Atharvalite/Dynamic-Read-Quorum-Scaling-in-Cloud-Native-Storage";
+  }
+
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <Flex bgGradient="linear(to-l, #18122B,#19376D)">
+    <Flex bgGradient="linear(to-l, #18122B,#19376D)" pos="fixed" width="100%">
       <Heading as="h2" p={3} size="lg" noOfLines={1}>
         <Link to="/">DQRS System</Link>
       </Heading>
       <Spacer />
-      <Button m={2} mr={4} bgColor="#146C94">
-        <Link to="/learnmore">Learn More</Link>
+      <Button m={2} mr={4} bgColor="#146C94" onClick={handleButtonClick}>
+        Learn More
       </Button>
       {/* <IconButton
         m={2}
@@ -35,3 +42,5 @@ function Navbar() {
 }
 
 export default Navbar;
+
+

@@ -5,7 +5,7 @@ const Preloader = () => {
   return (
     <Center height="100vh">
       <video
-        style={{ filter: "brightness(100%)" }}
+        style={{ filter: "brightness(130%)" }}
         src={pl}
         autoPlay
         muted
