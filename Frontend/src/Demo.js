@@ -1,12 +1,12 @@
 import React from 'react';
-import {Heading } from "@chakra-ui/react";
+import {Heading,Box } from "@chakra-ui/react";
 
 
 function Demo(){
     return(
-    <div>
-        <Heading>Hello this demo Info page</Heading>
-    </div>
+    <Box pos='absolute' top='55'>
+         <Heading >Hello this demo Info page</Heading>
+    </Box>
 )};
 
 export default Demo;

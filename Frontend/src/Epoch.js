@@ -29,6 +29,7 @@ function Epoch() {
     "read":0
 }
 const postAPI=async ()=>{
+  console.log(Quorum)
     let gotRes=await axios.post("/",Quorum).catch((err)=>{
         console.log("This error message",err);
     });
