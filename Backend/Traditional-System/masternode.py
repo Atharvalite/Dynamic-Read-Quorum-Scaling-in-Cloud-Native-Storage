@@ -24,7 +24,7 @@ class MasterNode():
         pass
     
     def service_req(self, read_num, write_num):
-        res = [0]
+        
         trad_res = [0]
         ri = 0
         rj = int(0.2*read_num)
@@ -35,24 +35,11 @@ class MasterNode():
             # read_req = self.generate_random_read(rj)
             write_req = self.generate_random_write(wj)
             
-            # if wi<write_num:
-            #     t1 = time.strftime("%H:%M:%S")
-            #     self.writeq.update_db_lit(write_req)
-            #     t2 = time.strftime("%H:%M:%S")
-            #     res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
-
-            # if ri<read_num:
-
-            #     t1 = time.strftime("%H:%M:%S")
-            #     self.readq.read(read_req)
-            #     t2 = time.strftime("%H:%M:%S")
-            #     res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
-
             if wi<write_num:
                 t1 = time.strftime("%H:%M:%S")
                 self.tradwrite.update_db_lit(write_req)
                 t2 = time.strftime("%H:%M:%S")
-                trad_res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
+                trad_res.append(trad_res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
             # if ri<read_num:
             #     t1 = time.strftime("%H:%M:%S")
@@ -74,9 +61,9 @@ class MasterNode():
             "total_requests":num,
             "requests":[]
         }
-        az_list = self.readq.az_list
+        az_list = self.tradread.az_list
 
-        data_item_list = self.readq.data_items
+        data_item_list = self.tradread.data_items
         low_val = 10
         high_val = 1000
 
@@ -90,7 +77,7 @@ class MasterNode():
     
     def generate_random_write(self, num):
         response = []
-        data_item_list = self.writeq.data_items
+        data_item_list = self.tradwrite.data_items
         low_val = 10
         high_val = 1000
         for i in range(num):
