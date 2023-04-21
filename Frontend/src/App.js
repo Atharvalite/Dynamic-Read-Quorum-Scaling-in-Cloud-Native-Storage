@@ -6,6 +6,7 @@ import Home from "./Home";
 import { extendTheme } from "@chakra-ui/react";
 import "@fontsource/source-code-pro/800.css";
 import Preloader from "./Preloader";
+import Demo from "./Demo";
 // import { Fonts } from "./Fonts";
 const theme = extendTheme({
   fonts: {
@@ -34,6 +35,8 @@ function App() {
         {!loading && (
           <Routes>
             <Route path="/" exact element={<Home />} />
+            <Route path="/demo" exact element={<Demo />} />
+
           </Routes>
         )}
       </Router>

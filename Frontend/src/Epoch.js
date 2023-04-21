@@ -33,6 +33,7 @@ const postAPI=async ()=>{
         console.log("This error message",err);
     });
     const data = await gotRes.data;
+    console.log(data);
     return data;
   }
 function submission(event){
