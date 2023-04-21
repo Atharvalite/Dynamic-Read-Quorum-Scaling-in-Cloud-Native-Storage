@@ -4,7 +4,11 @@ import {
   Flex,
   Heading,
   Spacer,
+<<<<<<< Updated upstream
   IconButton,
+=======
+  // IconButton,
+>>>>>>> Stashed changes
   useColorMode,
   Button
 } from "@chakra-ui/react";
@@ -22,7 +26,7 @@ function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Flex bgGradient="linear(to-l, #18122B,#19376D)" pos="fixed" width="100%">
-      <Heading as="h2" p={3} size="lg" noOfLines={1}>
+      <Heading as="h2" mt={5} p={3} size="lg" noOfLines={1}>
         <Link to="/">DQRS System</Link>
       </Heading>
       <Spacer />
