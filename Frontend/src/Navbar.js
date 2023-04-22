@@ -23,7 +23,7 @@ function Navbar() {
   return (
     <Flex bgGradient="linear(to-l, #18122B,#19376D)" pos="fixed" width="100%">
       <Heading as="h2"  p={3} size="lg" noOfLines={1}>
-        <Link to="/">DQRS System</Link>
+        <Link to="/">DRQS System</Link>
       </Heading>
       <Spacer />
       <Button m={2} mr={4} bgColor="#146C94" onClick={handleButtonClick}>

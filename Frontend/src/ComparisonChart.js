@@ -1,33 +1,64 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Center, Heading } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { useColorModeValue } from "@chakra-ui/react";
 import { useTheme } from "@emotion/react";
 import Chart from "chart.js/auto";
+import axios from "axios";
+import Typewriter from "typewriter-effect";
 
 
-const chartData = {
-  labels: ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"],
-  datasets: [
-    {
-      label: "Traditional",
-      data: [0, 10, 15, 20, 28, 36, 48, 65, 71, 84],
-      fill: false,
-      borderColor: "rgb(255, 99, 132)", // Set color for first line
-      tension: 0.1,
-    },
-    {
-      label: "DQRS System",
-      data: [0, 6, 11, 16, 20,24,38,52,60,67],
-      fill: false,
-      borderColor: "rgb(54, 162, 235)", // Set color for second line
-      tension: 0.1,
-    },
-  ],
-};
 
 function ComparisonChart() {
-  const theme = useTheme();
+    const [chartData, setChartData] = useState({});
+     const theme = useTheme();
+   useEffect(() => {
+     const fetchData = async () => {
+       try {
+         const [response1, response2] = await Promise.all([
+           axios.get("http://127.0.0.1:5000/"),
+           axios.get("http://127.0.0.1:4001/"),
+         ]);
+
+         const data1 = await response1.data;
+         const data2 = await response2.data;
+         console.log(data1);
+         console.log(data2); 
+         const formattedData = {
+           labels: [
+             "0",
+             "20",
+             "40",
+             "60",
+             "80",
+             "100",
+           ],
+           datasets: [
+             {
+               label: "DRQS",
+               data: data1,
+               fill: false,
+               borderColor: "rgb(75, 192, 192)",
+               tension: 0.1,
+             },
+             {
+               label: "Traditional",
+               data: data2,
+               fill: false,
+               borderColor: "rgb(192, 75, 192)",
+               tension: 0.1,
+             },
+           ],
+         };
+         setChartData(formattedData);
+       } catch (error) {
+         console.error(error);
+       }
+     };
+
+     fetchData();
+   }, []);
+
   const textColor = useColorModeValue(
     theme.colors.gray[700],
     theme.colors.white
@@ -67,18 +98,23 @@ function ComparisonChart() {
       },
     },
   };
-
-  // const [chartData, setChartData] = useState({});
+  if (!chartData || !chartData.datasets || !chartData.datasets[0].data) {
+    return (<Box width={600} height={300}>
+        <Center>
+          <Heading size="2xl">
+            <Typewriter
+              onInit={(typewriter) => {
+                typewriter.loop = true;
+                typewriter.typeString("LOADING...").start();
+              }}
+            />
+            <Heading size="sm">Processing the input</Heading>
+          </Heading>
+        </Center>
+      </Box>);
+  }
   return (
-    <Box
-      mt={50}
-      height="300px"
-      width="400px"
-      pos="fixed"
-      top="350"
-      left="700"
-      bgColor="#000000"
-    >
+    <Box  width={600} height={300} bgColor='#000000' opacity={0.7}>
       <Line data={chartData} options={options} />
     </Box>
   );

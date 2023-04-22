@@ -14,7 +14,7 @@ import {
   SliderThumb,
   Heading,
 } from "@chakra-ui/react";
-import axios from "./axios";
+import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 
 
@@ -28,21 +28,24 @@ function Epoch() {
     "write":0,
     "read":0
 }
-const postAPI=async ()=>{
-  console.log(Quorum)
-    let gotRes=await axios.post("/",Quorum).catch((err)=>{
-        console.log("This error message",err);
-    });
-    const data = await gotRes.data;
-    console.log(data);
-    return data;
-  }
+  const Navigation = async() => {
+     const [response1, response2] =await Promise.all([
+           axios.post("http://127.0.0.1:5000/",Quorum),
+           axios.post("http://127.0.0.1:4001/",Quorum),
+         ]).catch((err)=>{
+          console.log(err);
+         });
+         const res1=await response1.body;
+         const res2=await response2.body;
+         return [res1,res2];
+  };
 function submission(event){
   event.preventDefault();
     Quorum.write=writeQ;
     Quorum.read=readQ;
     console.log('Submitted...!!');
-    postAPI().then(()=>history("/demo"));
+    Navigation().then(()=>history("/demo"));
+
 }
   return (
     <Box ml={100} mb={100} width={350} pos="fixed" top="100" left="750">
