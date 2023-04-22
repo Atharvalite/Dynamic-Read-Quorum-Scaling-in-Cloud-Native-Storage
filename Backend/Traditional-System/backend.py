@@ -11,21 +11,26 @@ from masternode import MasterNode
 from traditional import traditional_read, traditional_write
 import dotenv
 from dotenv import load_dotenv
+import json
 load_dotenv('config.env')
 
 
 
 app = Flask(__name__)
 
+port = 4001
+
 cors = CORS(app)
 
 api = Api(app)
 
 
+trad_res = [0]
 class Testing(Resource):
     def __init__(self) -> None:
         super().__init__()
         self.node = MasterNode()
+        # self.trad_res = [0]
 
 
     def post(self):
@@ -33,13 +38,21 @@ class Testing(Resource):
         r = data["read"]
         w = data["write"]
 
-        return jsonify(self.node.service_req(r, w))
+        trad_res = self.node.service_req(r, w)
+
+        with open('result.json','w') as file: 
+            json.dump({"result":trad_res}, file)
+        print("Request Served")
+
+        return trad_res
     
     def get(self):
-        return jsonify({"Res: ":"Hello"})
+        with open('result.json','r') as file: 
+            r = json.load(file)
+        return r["result"]
     
 api.add_resource(Testing,'/')
 
 if __name__ == '__main__':
   
-    app.run(debug = True, threaded=True)
+    app.run(debug = True, port=port)

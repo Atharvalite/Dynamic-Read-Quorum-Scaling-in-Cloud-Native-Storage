@@ -51,7 +51,7 @@ class readquorum(configquorum):
                         # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
 
                     elif db['status']=='froze' and db['requests']<self.threshold*limit:
-                        print("How many times?")
+                        # print("How many times?")
                         self.availability_zones[id]["db"][z]['requests']+=1
                         self.availability_zones[id]["db"][z]['consistent_state_no'] = self.unfreeze(az=name, db_name=name+db["id"], consistent_no=db['consistent_state_no'])
                         v = self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item'])
@@ -145,3 +145,14 @@ class readquorum(configquorum):
                     heapq.heappush(pq, (distance, neighbor))
 
         return distances
+    
+    def get_percentage(num_req):
+        tot = 20
+
+        res = num_req//20 + 1
+
+        return 100- res/tot*100
+
+
+
+

@@ -69,8 +69,8 @@ class traditional_read(configquorum):
                         #     # print(self.read_x(az=name, db_name=name+db["id"], data_item=reqs[i]['data_item']))
         t2 = time.strftime("%H:%M:%S")
         tdelta = datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")
-        print("The time taken for read is: ")
-        print(tdelta)
+        # print("The time taken for read is: ")
+        # print(tdelta)
         # print((t2-t1).total_seconds())
 
      
@@ -147,7 +147,7 @@ class traditional_write(configquorum):
         creation_time = time.strftime("%H_%M_%S")
         lst_up = []
         for i in range(len(new_val_l)):
-            print("H    I ")
+            # print("H    I ")
             n = self.availability_zones[list(self.availability_zones.keys())[0]]['name']
             self.create_wal_file(f'{n}db_1', self.client[n], new_val_l[i],lst_up)
         # print(lst_up)
@@ -213,12 +213,12 @@ class traditional_write(configquorum):
             
             file_name = 'wal1/'+self.global_json[j]['file_name']
             curr_id = self.global_json[j]["id"]
-            print(self.global_json)
+            # print(self.global_json)
             if curr_id>consistent_no:
 
                 updt_file = open(file_name, 'r')
                 updt_jsons = json.load(updt_file) 
-                print(updt_jsons)
+                # print(updt_jsons)
                 for updt_json in updt_jsons:
                     keys = list(updt_json.keys())
                     for i in keys:
@@ -226,7 +226,7 @@ class traditional_write(configquorum):
                         x = updt_json[i]['dataitem'] 
                         new_val = updt_json[i]['new_val']
                         self.client[az][db_name].update_one({'_id':x},{'$set':{'value':new_val}})
-                        print(x)
+                        # print(x)
                 updt_file.close()
 
         return curr_id

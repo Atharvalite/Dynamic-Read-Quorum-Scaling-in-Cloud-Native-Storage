@@ -135,9 +135,13 @@ class traditional_read(configquorum):
 
 class traditional_write(configquorum):
     def __init__(self, MONGOURL) -> None:
-        super().__init__(MONGOURL)
-        self.global_id = 0
 
+        with open('wal1/wal_global.json', "r") as op:
+            self.global_json = json.load(op)
+        super().__init__(MONGOURL)
+        load_dotenv('config.env')
+
+        self.global_id = int(os.environ.get('global_id2'))
         pass
     def update_db_lit(self,new_val_l):
         creation_time = time.strftime("%H_%M_%S")
@@ -146,22 +150,22 @@ class traditional_write(configquorum):
             n = self.availability_zones[list(self.availability_zones.keys())[0]]['name']
             self.create_wal_file(f'{n}db_1', self.client[n], new_val_l[i],lst_up)
 
-        with open(f'wal/wal_report_{creation_time}.json', 'w') as wal_file:
+        with open(f'wal1/wal_report_{creation_time}.json', 'w') as wal_file:
             json.dump(lst_up, wal_file)
 
         # wal_file.write(lst_up)
-        with open(f'wal/wal_global.json', "r") as file:
+        with open(f'wal1/wal_global.json', "r") as file:
             master = json.load(file)
         master.append(
             {"id": self.global_id, "file_name": f"wal_report_{creation_time}.json"})
         
         
         self.global_id += 1
-        dotenv.set_key('config.env', "global_id", str(self.global_id))
+        dotenv.set_key('config.env', "global_id2", str(self.global_id))
         
-        with open(f'wal/wal_global.json', "w") as file:
+        with open(f'wal1/wal_global.json', "w") as file:
             json.dump(master, file)
-        self.update_db(new_val_l[i])
+        self.update_db()
 
     def update_db(self):
         availability_zones_k = list(self.availability_zones.keys())
@@ -175,8 +179,8 @@ class traditional_write(configquorum):
             for j in range(len(db_l)):
                 # if (db_l[j]['status'] != 'froze'):
                 dd_c_id = f'{name}db_{j}'
-                consistent_state_no = self.availability_zones[availability_zones_k[i]]['db'][i]['consistent_state_no']
-                self.availability_zones[availability_zones_k[i]]['db'][i]['consistent_state_no']  = self.update_thr_file(availability_zones_k[i],dd_c_id,consistent_state_no)
+                consistent_state_no = self.availability_zones[availability_zones_k[i]]['db'][j]['consistent_state_no']
+                self.availability_zones[availability_zones_k[i]]['db'][j]['consistent_state_no']  = self.update_thr_file(availability_zones_k[i],dd_c_id,consistent_state_no)
                 
                 # self.write_update_quorum(dd_c_id, db_c, new_val,db_l[j])
     def write_update_quorum(self,id, db, new_val: dict,db_l):
@@ -205,7 +209,7 @@ class traditional_write(configquorum):
 
         for j in range(len(self.global_json)):
             
-            file_name = 'wal/'+self.global_json[j]['file_name']
+            file_name = 'wal1/'+self.global_json[j]['file_name']
             curr_id = self.global_json[j]["id"]
             if curr_id>consistent_no:
 

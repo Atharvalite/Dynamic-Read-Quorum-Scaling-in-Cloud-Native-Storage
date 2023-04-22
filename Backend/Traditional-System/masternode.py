@@ -51,9 +51,7 @@ class MasterNode():
             wi+=wj
         self.tradwrite.update_az()
             
-        return {
-            "trad-result":trad_res
-        }
+        return trad_res
     
     
     def generate_random_read(self, num):

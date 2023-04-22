@@ -25,14 +25,14 @@ class MasterNode():
     
     def service_req(self, read_num, write_num):
         res = [0]
-        trad_res = [0]
+        # trad_res = [0]
         ri = 0
         rj = int(0.2*read_num)
         wi = 0
         wj = int(0.2*write_num)
 
         while(ri<read_num or wi<write_num):
-            read_req = self.generate_random_read(rj)
+            # read_req = self.generate_random_read(rj)
             write_req = self.generate_random_write(wj)
             
             if wi<write_num:
@@ -41,18 +41,18 @@ class MasterNode():
                 t2 = time.strftime("%H:%M:%S")
                 res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
-            if ri<read_num:
+            # if ri<read_num:
 
-                t1 = time.strftime("%H:%M:%S")
-                self.readq.read(read_req)
-                t2 = time.strftime("%H:%M:%S")
-                res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
+            #     t1 = time.strftime("%H:%M:%S")
+            #     self.readq.read(read_req)
+            #     t2 = time.strftime("%H:%M:%S")
+            #     res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
             # if wi<write_num:
             #     t1 = time.strftime("%H:%M:%S")
             #     self.tradwrite.update_db_lit(write_req)
             #     t2 = time.strftime("%H:%M:%S")
-            #     trad_res.append(datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S"))
+            #     trad_res.append(res[-1]+int((datetime.strptime(t2, "%H:%M:%S") - datetime.strptime(t1, "%H:%M:%S")).total_seconds()))
 
             # if ri<read_num:
             #     t1 = time.strftime("%H:%M:%S")
@@ -64,10 +64,7 @@ class MasterNode():
             wi+=wj
         self.readq.update_az()
             
-        return {
-            "our-result":res,
-            "trad-result":trad_res
-        }
+        return res
     
     
     def generate_random_read(self, num):
